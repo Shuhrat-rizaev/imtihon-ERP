@@ -41,9 +41,9 @@ const Cards = () => {
       <div className="flex flex-col gap-3 py-5 border-r w-[254px] h-[684px]">
         {[
           { label: "Xodimlar ro’yxati", path: "/Employees" },
-          { label: "Xodimlar davomati", path: "/attendance" },
+         
           { label: "Mijozlar", path: "/clients" },
-          { label: "Oylik hisobot", path: "/salary-report" },
+          { label: "Smenalar", path: "/salary-report" },
         ].map((item, index) => (
           <Link
             to={item.path}

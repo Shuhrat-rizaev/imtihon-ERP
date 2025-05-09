@@ -47,3 +47,21 @@ export interface Employee {
   user_role: string;
   user: User;
 }
+export type Client = {
+  id: number;
+  name: string;
+  phone: string;
+  avatar: string;
+  branch: number;
+  branch_name: string;
+  license_file: string | null;
+  created_at: string;
+  updated_at: string;
+};
+export interface Shift {
+  id: number;
+  name: string;
+  start_time: string;
+  end_time: string;
+  branch: number;
+}
