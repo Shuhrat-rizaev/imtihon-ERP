@@ -150,8 +150,6 @@ const Employees = () => {
           </table>
         </div>
       </div>
-
-      {/* Add Employee Modal */}
       <Modal
         title="Yangi xodim qo‘shish"
         open={isModalOpen}

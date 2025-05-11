@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { ApiClient } from "../utilis/Axiosintance";
 import Navbar from "./Navbar";
 import { Link } from "react-router-dom";
+import { Modal, Button, Form, Input, message } from "antd";
 import icon from "../assets/images/Icon (13).svg";
 
 type Client = {
@@ -15,16 +16,24 @@ type Client = {
   updated_at: string;
 };
 
+type ClientFormValues = {
+  name: string;
+  phone: string;
+  branch_name: string;
+};
+
 const Clients = () => {
   const [clients, setClients] = useState<Client[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [form] = Form.useForm();
 
   const getClients = async () => {
     try {
-      const res = await ApiClient.get("/company/clients/");
+      const res = await ApiClient.get<{ results: Client[] }>(
+        "/company/clients/"
+      );
       setClients(res.data.results);
-      console.log(res.data.results);
-      
     } catch (error) {
       console.error(error);
     }
@@ -33,6 +42,31 @@ const Clients = () => {
   useEffect(() => {
     getClients();
   }, []);
+
+  const handleAddClient = async (values: ClientFormValues) => {
+    try {
+      const formData = new FormData();
+      formData.append("name", values.name);
+      formData.append("phone", values.phone);
+      formData.append("branch_name", values.branch_name);
+
+      const res = await ApiClient.post("/company/clients/", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      message.success("Mijoz muvaffaqiyatli qo'shildi");
+      form.resetFields();
+      console.log(res);
+
+      setIsModalOpen(false);
+      getClients(); // ro'yxatni yangilash
+    } catch (error) {
+      console.error(error);
+      message.error("Xatolik yuz berdi");
+    }
+  };
 
   const filteredClients = clients.filter((client) =>
     client.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -63,7 +97,7 @@ const Clients = () => {
 
         {/* Main content */}
         <div className="p-4 w-full">
-          <div className="mb-4">
+          <div className="mb-4 flex justify-between">
             <input
               type="text"
               className="w-[400px] p-2 border rounded-lg"
@@ -71,6 +105,9 @@ const Clients = () => {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
+            <Button type="primary" onClick={() => setIsModalOpen(true)}>
+              + Mijoz qo‘shish
+            </Button>
           </div>
 
           <table className="min-w-full bg-white rounded-lg shadow">
@@ -97,6 +134,48 @@ const Clients = () => {
               ))}
             </tbody>
           </table>
+
+          {/* Add Client Modal */}
+          <Modal
+            title="Yangi mijoz qo‘shish"
+            open={isModalOpen}
+            onCancel={() => setIsModalOpen(false)}
+            footer={null}
+          >
+            <Form form={form} layout="vertical" onFinish={handleAddClient}>
+              <Form.Item
+                label="Ism"
+                name="name"
+                rules={[{ required: true, message: "Iltimos ism kiriting" }]}
+              >
+                <Input />
+              </Form.Item>
+
+              <Form.Item
+                label="Telefon"
+                name="phone"
+                rules={[
+                  { required: true, message: "Iltimos telefon kiriting" },
+                ]}
+              >
+                <Input />
+              </Form.Item>
+
+              <Form.Item
+                label="Filial"
+                name="branch_name"
+                rules={[{ required: true, message: "Iltimos filial kiriting" }]}
+              >
+                <Input />
+              </Form.Item>
+
+              <Form.Item>
+                <Button type="primary" htmlType="submit" className="w-full">
+                  Qo‘shish
+                </Button>
+              </Form.Item>
+            </Form>
+          </Modal>
         </div>
       </div>
     </div>
